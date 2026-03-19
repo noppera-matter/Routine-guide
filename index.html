@@ -45,6 +45,47 @@
             width: 100vw;
         }
 
+        /* [🌟 iOS Bottom Tab Bar 🌟] */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: calc(52px + var(--safe-bottom));
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 0.5px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: var(--safe-bottom);
+            z-index: 500;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-gray);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .tab-item i { margin-bottom: 3px; }
+        .tab-item.active { color: var(--ios-blue); }
+
+        .btn-notif-req {
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
         /* [Main SPA Control] */
         #app-root {
             position: relative;
@@ -167,16 +208,45 @@
                     <div class="main-category-item" onclick="goToInput('운동', '🧘‍♂️')"><button class="main-circle-btn">🧘‍♂️</button><div class="circle-label">운동</div></div>
                     <div class="main-category-item" onclick="goToInput('뷰티', '💇‍♀️')"><button class="main-circle-btn">💇‍♀️</button><div class="circle-label">뷰티</div></div>
                 </div>
+                <!-- Spacing for Bottom Bar -->
+                <div style="height: 100px;"></div>
             </div>
+
+            <!-- Persistent Tab Bar for Root Views -->
+            <nav class="tab-bar">
+                <div class="tab-item active" id="tab-splash" onclick="switchView('splash')">
+                    <i data-lucide="layout-grid" size="24"></i>
+                    <span>홈</span>
+                </div>
+                <div class="tab-item" id="tab-home" onclick="switchView('home')">
+                    <i data-lucide="clipboard-list" size="24"></i>
+                    <span>기록</span>
+                </div>
+            </nav>
         </section>
 
         <!-- (2) Home View (List) -->
         <section id="home-view">
             <header style="display: flex; justify-content: space-between; align-items: center;">
                 <div><div class="header-title">오늘의 기록 🗓️</div><div id="today-date" style="color: var(--ios-gray); font-size: 14px; margin-top: 2px;"></div></div>
-                <div style="display: flex; gap: 12px;"><button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button></div>
             </header>
-            <div class="content-area"><div id="routine-list"></div></div>
+            <div class="content-area">
+                <div id="routine-list"></div>
+                <!-- Spacing for Bottom Bar -->
+                <div style="height: 80px;"></div>
+            </div>
+
+            <!-- Persistent Tab Bar for Root Views -->
+            <nav class="tab-bar">
+                <div class="tab-item" id="tab-splash-2" onclick="switchView('splash')">
+                    <i data-lucide="layout-grid" size="24"></i>
+                    <span>홈</span>
+                </div>
+                <div class="tab-item active" id="tab-home-2" onclick="switchView('home')">
+                    <i data-lucide="clipboard-list" size="24"></i>
+                    <span>기록</span>
+                </div>
+            </nav>
         </section>
 
         <!-- (3) Input View -->
@@ -209,7 +279,16 @@
         function switchView(v) {
             document.querySelectorAll('section').forEach(s => s.style.display = 'none');
             document.getElementById(`${v}-view`).style.display = 'flex';
+            
+            // Toggle Tab Bar Active State
+            const isHomeActive = (v === 'splash');
+            document.getElementById('tab-splash').classList.toggle('active', isHomeActive);
+            document.getElementById('tab-home').classList.toggle('active', !isHomeActive);
+            document.getElementById('tab-splash-2').classList.toggle('active', isHomeActive);
+            document.getElementById('tab-home-2').classList.toggle('active', !isHomeActive);
+
             checkPermissionOnLoad();
+            lucide.createIcons(); // Ensure icons load in new tabs
         }
 
         function goToInput(cat, ico) {
