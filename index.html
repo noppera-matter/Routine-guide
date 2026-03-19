@@ -7,13 +7,9 @@
     
     <!-- PWA 및 모바일 최적화 설정 -->
     <link rel="apple-touch-icon" href="icon.png">
-    
-    <!-- Android 주소창 색상 및 iOS 상태바 설정 -->
     <meta name="theme-color" content="#F2F2F7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
-    <!-- 🛑 [수정 안내] manifest.json 내의 아이콘 경로도 실제 이미지 파일명으로 맞춰 수정해야 합니다. -->
     <link rel="manifest" href="manifest.json">
 
     <!-- Google Fonts: Pretendard for iOS feel -->
@@ -68,7 +64,7 @@
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* [Splash/Start View] */
+        /* [Splash View] */
         #splash-view {
             display: flex;
             justify-content: center;
@@ -125,10 +121,91 @@
         input, textarea { width: 100%; padding: 18px; border: 0.5px solid var(--ios-border); border-radius: 16px; font-size: 16px; background-color: var(--ios-white); -webkit-appearance: none; }
         input:focus, textarea:focus { outline: none; border-color: var(--ios-blue); }
 
+        /* [Repeat Preset Selector] */
+        .repeat-mode-tabs {
+            display: flex;
+            background-color: #E5E5EA;
+            padding: 2px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .mode-tab.active {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .repeat-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .day-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--ios-border);
+            background: white;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-btn.active {
+            background-color: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+
+        .repeat-summary {
+            font-size: 11px;
+            color: var(--ios-blue);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
         footer { padding: 20px; background-color: var(--ios-white); border-top: 0.5px solid var(--ios-border); display: flex; gap: 12px; padding-bottom: calc(20px + var(--safe-bottom)); }
         .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; cursor: pointer; }
         .btn-save { background-color: var(--ios-blue); color: white; }
         .btn-cancel { background-color: #E5E5EA; color: #1C1C1E; }
+
+        /* [Notification Alert Component] */
+        .notif-alert-bar {
+            background-color: #FFF9E6;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid #FFD60A;
+        }
+        .btn-notif-req {
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -171,8 +248,18 @@
                     <div class="header-title">오늘의 기록 🗓️</div>
                     <div id="today-date" style="color: var(--ios-gray); font-size: 14px; margin-top: 2px;"></div>
                 </div>
-                <button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button>
+                <div style="display: flex; gap: 12px;">
+                    <button id="notif-btn" onclick="requestPermission()" style="border:none; background:none; font-size: 20px; padding: 4px; display:none;">🔔</button>
+                    <button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button>
+                </div>
             </header>
+            
+            <!-- Notification Alert Bar -->
+            <div id="notif-bar" class="notif-alert-bar" style="display:none;">
+                <span>📢 푸시 알림을 활성화하고 잊지 마세요!</span>
+                <button class="btn-notif-req" onclick="requestNotificationPermission()">알림 켜기</button>
+            </div>
+
             <div class="content-area">
                 <div id="routine-list"></div>
             </div>
@@ -184,8 +271,26 @@
             <div class="content-area">
                 <label class="form-label">루틴 이름</label>
                 <input type="text" id="routine-name" placeholder="예: 무알콜 폼 세안">
+                
                 <label class="form-label">알림 시간</label>
                 <input type="time" id="routine-time" value="09:00">
+                
+                <label class="form-label">반복 설정</label>
+                <div class="repeat-mode-tabs" id="mode-tabs">
+                    <button class="mode-tab active" onclick="setRepeatMode('everyday')">매일</button>
+                    <button class="mode-tab" onclick="setRepeatMode('weekdays')">평일</button>
+                    <button class="mode-tab" onclick="setRepeatMode('custom')">직접 선택</button>
+                </div>
+                <div class="repeat-selector" id="day-selector">
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="월">월</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="화">화</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="수">수</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="목">목</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="금">금</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="토">토</button>
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="일">일</button>
+                </div>
+
                 <label class="form-label">메모</label>
                 <textarea id="routine-memo" rows="4" placeholder="메모할 내용을 적어보세요."></textarea>
             </div>
@@ -199,41 +304,179 @@
     <script>
         lucide.createIcons();
 
-        const STORAGE_KEY = 'self_care_iphone_v6_pwa';
+        // [State Management]
+        const STORAGE_KEY = 'self_care_iphone_v6_pwa_push';
         let routines = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         let activeCat = ''; 
         let activeIco = '';
 
+        // [PWA: Service Worker Registration]
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('[SW] Registered!'))
+                .catch(err => console.error('[SW] Failed', err));
+        }
+
+        // [Logic: View Switching]
         function switchView(viewName) {
             document.querySelectorAll('section').forEach(s => s.style.display = 'none');
             const target = document.getElementById(`${viewName}-view`);
             if (target) target.style.display = 'flex';
+            checkNotificationStatus();
         }
 
         function goToInput(cat, ico) {
             activeCat = cat; activeIco = ico;
             document.getElementById('input-title').innerText = `${ico} ${cat} 관리 등록`;
+            resetDaySelection();
             switchView('input'); 
         }
 
+        // [Logic: Notification Permission]
+        function checkNotificationStatus() {
+            const bar = document.getElementById('notif-bar');
+            const btn = document.getElementById('notif-btn');
+            
+            if (!('Notification' in window)) return;
+
+            if (Notification.permission === 'default') {
+                bar.style.display = 'flex';
+                btn.style.display = 'none';
+            } else if (Notification.permission === 'granted') {
+                bar.style.display = 'none';
+                btn.style.display = 'block';
+            } else {
+                bar.style.display = 'none';
+                btn.style.display = 'none';
+            }
+        }
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    alert('알림이 정상적으로 수신됩니다! ✨');
+                    checkNotificationStatus();
+                }
+            });
+        }
+
+        // [Logic: Day Selection]
+        function setRepeatMode(mode) {
+           const tabs = document.querySelectorAll('.mode-tab');
+           tabs.forEach(t => t.classList.remove('active'));
+           event.currentTarget.classList.add('active');
+           const days = document.querySelectorAll('#day-selector .day-btn');
+           days.forEach((btn, idx) => {
+               if (mode === 'everyday') btn.classList.add('active');
+               else if (mode === 'weekdays') { if (idx < 5) btn.classList.add('active'); else btn.classList.remove('active'); }
+           });
+        }
+
+        function toggleDayCustom(btn) {
+            btn.classList.toggle('active');
+            const tabs = document.querySelectorAll('.mode-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabs[2].classList.add('active');
+        }
+
+        function getSelectedDays() {
+            const btns = document.querySelectorAll('#day-selector .day-btn.active');
+            return Array.from(btns).map(b => b.dataset.day);
+        }
+
+        function resetDaySelection() {
+            setRepeatMode('everyday');
+            const tabs = document.querySelectorAll('.mode-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabs[0].classList.add('active');
+        }
+
+        // [Logic: Data Handling & Test Notification]
         function handleSave() {
             const name = document.getElementById('routine-name').value;
+            const time = document.getElementById('routine-time').value;
+            const memo = document.getElementById('routine-memo').value;
+            const selectedDays = getSelectedDays();
+            
+            let modeLabel = '';
+            if (selectedDays.length === 7) modeLabel = '매일';
+            else if (selectedDays.length === 5 && !selectedDays.includes('토') && !selectedDays.includes('일')) modeLabel = '평일';
+            else modeLabel = selectedDays.join(',');
+
             if (!name) return alert('이름을 입력하세요!');
+            if (selectedDays.length === 0) return alert('반복할 요일을 하나 이상 선택해 주세요.');
 
             const newRoutine = {
                 id: Date.now(),
                 category: activeCat, icon: activeIco,
-                name: name, time: document.getElementById('routine-time').value || '09:00',
-                memo: document.getElementById('routine-memo').value,
+                name: name, time: time || '09:00',
+                memo: memo,
+                days: selectedDays,
+                modeLabel: modeLabel,
                 date: new Date().toLocaleDateString()
             };
 
             routines.unshift(newRoutine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
             renderRoutines();
+            
+            // 🚨 Trigger immediate Test & Start Scheduler
+            triggerTestNotification(activeIco, name);
+            startGlobalAlarmScheduler();
+
             switchView('home');
             document.getElementById('routine-name').value = '';
             document.getElementById('routine-memo').value = '';
+            resetDaySelection();
+        }
+        // [Logic: Regular Alarm Scheduler]
+        let alarmInterval = null;
+
+        function startGlobalAlarmScheduler() {
+            if (alarmInterval) clearInterval(alarmInterval);
+            
+            // Every 60 seconds, check for routines matching the current time
+            alarmInterval = setInterval(() => {
+                const now = new Date();
+                const curDay = ['일','월','화','수','목','금','토'][now.getDay()];
+                const curTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+                routines.forEach(r => {
+                    if (r.days.includes(curDay) && r.time === curTime) {
+                        displayAlarmNotification(r);
+                    }
+                });
+            }, 60000); 
+        }
+
+        function displayAlarmNotification(routine) {
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(`[정기알림] ${routine.category} 시간입니다!`, {
+                        body: `${routine.icon} ${routine.name} 루틴을 수행할 시간이에요.`,
+                        icon: 'icon.png',
+                        badge: 'icon.png',
+                        vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 170, 40, 450, 110, 200, 110, 170, 40],
+                        tag: `routine-alarm-${routine.id}`
+                    });
+                });
+            }
+        }
+
+        function triggerTestNotification(icon, name) {
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(registration => {
+                    setTimeout(() => {
+                        registration.showNotification('관리 등록 완료! Spark ✨', {
+                            body: `${icon} [${name}] 계획이 등록되었습니다. 3초 뒤 알림 테스트 성공!`,
+                            icon: 'icon.png',
+                            badge: 'icon.png',
+                            vibrate: [200, 100, 200],
+                            tag: 'routine-save'
+                        });
+                    }, 3000); // 3-second delay as requested
+                });
+            }
         }
 
         function renderRoutines() {
@@ -244,13 +487,15 @@
             }
             list.innerHTML = '';
             routines.forEach(r => {
+                const label = r.days ? r.days.join(',') : '매일';
                 const card = document.createElement('div');
                 card.className = 'routine-card';
                 card.innerHTML = `
                     <div class="routine-icon">${r.icon}</div>
                     <div class="routine-info">
                         <div class="routine-name">${r.name}</div>
-                        <div style="font-size:12px; color:gray">🔔 ${r.time} | ${r.category}</div>
+                        <div class="routine-meta">🔔 ${r.time} | ${r.category}</div>
+                        <div class="repeat-summary">반복: ${label}</div>
                     </div>
                     <button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30; padding:10px;"><i data-lucide="trash-2" size="20"></i></button>
                 `;
@@ -271,6 +516,8 @@
             const dateStr = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
             document.getElementById('today-date').innerText = dateStr;
             renderRoutines();
+            checkNotificationStatus();
+            startGlobalAlarmScheduler(); // Start checking for regular alarms
         };
     </script>
 </body>
