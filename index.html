@@ -175,9 +175,46 @@
             border-top: 0.5px solid var(--ios-border); display: flex; gap: 0.75rem; 
             padding-bottom: calc(1.2rem + var(--safe-bottom)); 
         }
-        .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; }
+
+        .btn { flex: 1; padding: 1.1rem; border-radius: 1rem; font-size: 1.05rem; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+        .btn:active { opacity: 0.7; }
         .btn-save { background-color: var(--ios-blue); color: white; }
         .btn-cancel { background-color: #E5E5EA; color: #1C1C1E; }
+
+        /* [⭐ Evaluation Modal ⭐] */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 2000;
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            width: 85%; max-width: 320px; background: white; border-radius: 1.5rem; padding: 1.5rem;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .star-container { display: flex; justify-content: center; gap: 0.5rem; margin: 1.2rem 0; }
+        .star-btn { font-size: 1.8rem; color: #E5E5EA; cursor: pointer; transition: transform 0.1s; }
+        .star-btn.active { color: #FFCC00; }
+        .star-btn:active { transform: scale(1.2); }
+        
+        .eval-memo { width: 100%; height: 80px; border: 1px solid #E5E5EA; border-radius: 0.8rem; padding: 0.8rem; font-size: 0.9rem; margin-bottom: 1rem; resize: none; }
+        .modal-footer { display: flex; gap: 0.6rem; }
+        .btn-modal { padding: 0.8rem; border-radius: 0.8rem; border: none; font-weight: 700; flex: 1; cursor: pointer; }
+        .btn-done { background: var(--ios-blue); color: white; }
+        .btn-close { background: #F2F2F7; color: #8E8E93; }
+
+        /* [Routine Card Completion State] */
+        .routine-card.completed { opacity: 0.6; background-color: #F8F8F9; }
+        .routine-card.completed .routine-icon { filter: grayscale(1); opacity: 0.5; }
+        .btn-check { 
+            width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 2px solid #E5E5EA; 
+            background: white; color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .btn-check.active { background: #34C759; border-color: #34C759; }
+        .completed-badge { font-size: 0.7rem; font-weight: 800; color: #34C759; margin-top: 0.2rem; display: block; }
 
         /* [🌟 iOS Style Toast Notification 🌟] */
         #toast-container {
@@ -221,6 +258,29 @@
             <div class="p-alert">
                 <span>⚠️ 알림 권한이 거절되어 루틴 알림을 받을 수 없어요!</span>
                 <button onclick="requestNotificationPermission()" style="border:none; background:white; color:#FF3B30; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800;">다시 허용</button>
+            </div>
+        </div>
+
+        <!-- [⭐ 평가 모달 ⭐] -->
+        <div id="eval-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-title">오늘의 관리 어땠나요?</div>
+                <p style="font-size: 0.85rem; color: #8E8E93; margin-bottom: 1rem;">성취도를 별점으로 기록해 주세요.</p>
+                
+                <div class="star-container" id="star-box">
+                    <span class="star-btn" onclick="setRating(1)">⭐</span>
+                    <span class="star-btn" onclick="setRating(2)">⭐</span>
+                    <span class="star-btn" onclick="setRating(3)">⭐</span>
+                    <span class="star-btn" onclick="setRating(4)">⭐</span>
+                    <span class="star-btn" onclick="setRating(5)">⭐</span>
+                </div>
+                
+                <textarea id="eval-memo" class="eval-memo" placeholder="느낀 점이나 특이사항을 적어주세요..."></textarea>
+                
+                <div class="modal-footer">
+                    <button class="btn-modal btn-close" onclick="closeEvalModal()">취소</button>
+                    <button class="btn-modal btn-done" onclick="saveEvaluation()">저장하기</button>
+                </div>
             </div>
         </div>
 
@@ -295,9 +355,11 @@
 
     <script>
         lucide.createIcons();
-        const STORAGE_KEY = 'self_care_iphone_v7_toast_pwa';
+        const STORAGE_KEY = 'self_care_iphone_eval_v1';
         let routines = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         let activeCat = ''; let activeIco = '';
+        let currentRating = 0;
+        let evalRoutineId = null;
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => console.log('[SW] OK'));
@@ -406,9 +468,26 @@
             const list = document.getElementById('routine-list');
             list.innerHTML = routines.length === 0 ? `<div style="text-align:center; color:gray; margin-top:60px;"><p>기록이 없습니다.</p></div>` : '';
             routines.forEach(r => {
+                const isComp = r.completed || false;
                 const card = document.createElement('div');
-                card.className = 'routine-card';
-                card.innerHTML = `<div class="routine-icon">${r.icon}</div><div class="routine-info"><div class="routine-name">${r.name}</div><div class="routine-meta">🔔 ${r.time} | 요일 [${r.days.join(',')}]</div></div><button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30;"><i data-lucide="trash-2" size="20"></i></button>`;
+                card.className = `routine-card ${isComp ? 'completed' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="routine-icon">${r.icon}</div>
+                    <div class="routine-info">
+                        <div class="routine-name">${r.name} ${isComp ? '<span class="completed-badge">✓ 완료됨</span>' : ''}</div>
+                        <div class="routine-meta">
+                            🔔 ${r.time} | ${r.modeLabel || '반복'}
+                            ${isComp && r.rating ? `<br><span style="color:#FFCC00;">${'★'.repeat(r.rating)}</span> <span style="font-size:11px;">${r.memo || ''}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-check ${isComp ? 'active' : ''}" onclick="toggleComplete(${r.id})">
+                        <i data-lucide="check" size="18"></i>
+                    </button>
+                    <button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30; margin-left:8px;">
+                        <i data-lucide="trash-2" size="20"></i>
+                    </button>
+                `;
                 list.appendChild(card);
             });
             
@@ -418,6 +497,66 @@
             list.appendChild(spacer);
 
             lucide.createIcons();
+        }
+
+        function toggleComplete(id) {
+            const r = routines.find(x => x.id === id);
+            if (!r) return;
+
+            if (!r.completed) {
+                // 완료되지 않은 경우 매기기 모달 띄우기
+                openEvalModal(id);
+            } else {
+                // 이미 완료된 경우 취소 (확인 팝업 가능)
+                if(confirm('완료 기록을 삭제하시겠습니까?')) {
+                    r.completed = false;
+                    r.rating = 0;
+                    r.memo = '';
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+                    renderRoutines();
+                }
+            }
+        }
+
+        function openEvalModal(id) {
+            evalRoutineId = id;
+            currentRating = 0;
+            document.getElementById('eval-memo').value = '';
+            updateStars();
+            document.getElementById('eval-modal').style.display = 'flex';
+        }
+
+        function closeEvalModal() {
+            document.getElementById('eval-modal').style.display = 'none';
+        }
+
+        function setRating(n) {
+            currentRating = n;
+            updateStars();
+        }
+
+        function updateStars() {
+            const stars = document.getElementById('star-box').children;
+            for (let i = 0; i < stars.length; i++) {
+                stars[i].classList.toggle('active', i < currentRating);
+            }
+        }
+
+        function saveEvaluation() {
+            if (currentRating === 0) {
+                alert('최소 1점 이상의 별점을 선택해 주세요!');
+                return;
+            }
+            const r = routines.find(x => x.id === evalRoutineId);
+            if (r) {
+                r.completed = true;
+                r.rating = currentRating;
+                r.memo = document.getElementById('eval-memo').value;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+                renderRoutines();
+                closeEvalModal();
+                showiOSNotification('🎉 관리 완료!', '수고하셨습니다. 기록이 저장되었습니다.');
+            }
         }
 
         function deleteRoutine(id) { if (confirm('삭제할까요?')) { routines = routines.filter(r => r.id !== id); localStorage.setItem(STORAGE_KEY, JSON.stringify(routines)); renderRoutines(); } }
