@@ -54,43 +54,22 @@
 
         section {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none; /* Controlled by switchView() */
-            flex-direction: column;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column;
             background-color: var(--ios-bg);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* [Splash View] */
-        #splash-view {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(180deg, #FFFFFF 0%, #F2F2F7 100%);
-            z-index: 100;
-        }
-
-        .splash-content {
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
-
+        #splash-view { display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .splash-content { text-align: center; width: 100%; max-width: 400px; }
         .app-logo { display: block; margin-bottom: 24px; }
         .app-logo-img { width: 120px; height: 120px; object-fit: contain; }
         .app-name { font-size: 28px; font-weight: 800; margin-bottom: 48px; color: var(--ios-text); letter-spacing: -1px; }
 
         .main-category-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            padding: 20px;
-            justify-items: center;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 20px;
         }
-
         .main-category-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .main-circle-btn {
             width: 100px; height: 100px; border-radius: 50%; border: none; background: white;
@@ -117,407 +96,230 @@
         .routine-meta { font-size: 12px; color: var(--ios-gray); }
 
         /* [Input Form Style] */
-        .form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #3A3A3C; margin-top: 20px; }
-        input, textarea { width: 100%; padding: 18px; border: 0.5px solid var(--ios-border); border-radius: 16px; font-size: 16px; background-color: var(--ios-white); -webkit-appearance: none; }
-        input:focus, textarea:focus { outline: none; border-color: var(--ios-blue); }
+        .form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #3A3A3C; margin-top: 18px; }
+        input, textarea { width: 100%; padding: 16px; border: 0.5px solid var(--ios-border); border-radius: 14px; font-size: 16px; background-color: var(--ios-white); -webkit-appearance: none; }
 
-        /* [Repeat Preset Selector] */
-        .repeat-mode-tabs {
-            display: flex;
-            background-color: #E5E5EA;
-            padding: 2px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
+        .repeat-mode-tabs { display: flex; background-color: #E5E5EA; padding: 2px; border-radius: 10px; margin-bottom: 10px; }
+        .mode-tab { flex: 1; padding: 7px; border: none; background: transparent; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .mode-tab.active { background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .mode-tab {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            background: transparent;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.2s;
-        }
-
-        .mode-tab.active {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .repeat-selector {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .day-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid var(--ios-border);
-            background: white;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .day-btn.active {
-            background-color: var(--ios-blue);
-            color: white;
-            border-color: var(--ios-blue);
-        }
-
-        .repeat-summary {
-            font-size: 11px;
-            color: var(--ios-blue);
-            margin-top: 4px;
-            font-weight: 600;
-        }
+        .day-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--ios-border); background: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .day-btn.active { background-color: var(--ios-blue); color: white; border-color: var(--ios-blue); }
 
         footer { padding: 20px; background-color: var(--ios-white); border-top: 0.5px solid var(--ios-border); display: flex; gap: 12px; padding-bottom: calc(20px + var(--safe-bottom)); }
-        .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; cursor: pointer; }
+        .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; }
         .btn-save { background-color: var(--ios-blue); color: white; }
         .btn-cancel { background-color: #E5E5EA; color: #1C1C1E; }
 
-        /* [Notification Alert Component] */
-        .notif-alert-bar {
-            background-color: #FFF9E6;
-            padding: 14px 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 0.5px solid #FFD60A;
+        /* [🌟 iOS Style Toast Notification 🌟] */
+        #toast-container {
+            position: fixed; top: -100px; left: 50%; width: 92%; max-width: 400px; z-index: 1000;
+            transform: translateX(-50%); transition: top 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
-        .btn-notif-req {
-            background: var(--ios-blue);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
+
+        .ios-toast {
+            background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.3); border-radius: 24px; padding: 16px 20px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 14px;
         }
+
+        .toast-show { top: calc(16px + var(--safe-top)) !important; }
+        
+        .toast-icon { width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .toast-info { flex: 1; }
+        .toast-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .toast-body { font-size: 13px; color: var(--ios-gray); }
+
+        /* [Banner: Permission Denied] */
+        .p-alert { background: #FF3B30; color: white; padding: 14px 20px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 16px 16px; margin: 0 10px; box-shadow: 0 8px 20px rgba(255, 59, 48, 0.2); }
     </style>
 </head>
 <body>
 
     <div id="app-root">
-        
+        <!-- Toast Notification Container -->
+        <div id="toast-container">
+            <div class="ios-toast">
+                <div class="toast-icon" id="t-icon">🛁</div>
+                <div class="toast-info">
+                    <div class="toast-title" id="t-title">알림</div>
+                    <div class="toast-body" id="t-body">내용이 여기에 들어갑니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Permission Denied Alert -->
+        <div id="notif-denied-alert" style="display: none; position: absolute; top: var(--safe-top); width: 100%; z-index: 1000;">
+            <div class="p-alert">
+                <span>⚠️ 알림 권한이 거절되어 루틴 알림을 받을 수 없어요!</span>
+                <button onclick="requestNotificationPermission()" style="border:none; background:white; color:#FF3B30; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800;">다시 허용</button>
+            </div>
+        </div>
+
         <!-- (1) Splash View -->
         <section id="splash-view" style="display: flex;">
             <div class="splash-content">
-                <div class="app-logo">
-                    <img src="icon.png" alt="App Logo" class="app-logo-img">
-                </div>
+                <div class="app-logo"><img src="icon.png" alt="Logo" class="app-logo-img"></div>
                 <h1 class="app-name">나의 관리 루틴</h1>
                 <div class="main-category-grid">
-                    <div class="main-category-item" onclick="goToInput('바디', '🛁')">
-                        <button class="main-circle-btn">🛁</button>
-                        <div class="circle-label">바디</div>
-                    </div>
-                    <div class="main-category-item" onclick="goToInput('피부', '🧴')">
-                        <button class="main-circle-btn">🧴</button>
-                        <div class="circle-label">피부</div>
-                    </div>
-                    <div class="main-category-item" onclick="goToInput('운동', '🧘‍♂️')">
-                        <button class="main-circle-btn">🧘‍♂️</button>
-                        <div class="circle-label">운동</div>
-                    </div>
-                    <div class="main-category-item" onclick="goToInput('뷰티', '💇‍♀️')">
-                        <button class="main-circle-btn">💇‍♀️</button>
-                        <div class="circle-label">뷰티</div>
-                    </div>
+                    <div class="main-category-item" onclick="goToInput('바디', '🛁')"><button class="main-circle-btn">🛁</button><div class="circle-label">바디</div></div>
+                    <div class="main-category-item" onclick="goToInput('피부', '🧴')"><button class="main-circle-btn">🧴</button><div class="circle-label">피부</div></div>
+                    <div class="main-category-item" onclick="goToInput('운동', '🧘‍♂️')"><button class="main-circle-btn">🧘‍♂️</button><div class="circle-label">운동</div></div>
+                    <div class="main-category-item" onclick="goToInput('뷰티', '💇‍♀️')"><button class="main-circle-btn">💇‍♀️</button><div class="circle-label">뷰티</div></div>
                 </div>
-                <p style="color: var(--ios-gray); margin-top: 40px; font-size: 14px; font-weight: 500;">관리 항목을 선택해 보세요</p>
             </div>
         </section>
 
         <!-- (2) Home View (List) -->
         <section id="home-view">
             <header style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="header-title">오늘의 기록 🗓️</div>
-                    <div id="today-date" style="color: var(--ios-gray); font-size: 14px; margin-top: 2px;"></div>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button id="notif-btn" onclick="requestPermission()" style="border:none; background:none; font-size: 20px; padding: 4px; display:none;">🔔</button>
-                    <button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button>
-                </div>
+                <div><div class="header-title">오늘의 기록 🗓️</div><div id="today-date" style="color: var(--ios-gray); font-size: 14px; margin-top: 2px;"></div></div>
+                <div style="display: flex; gap: 12px;"><button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button></div>
             </header>
-            
-            <!-- Notification Alert Bar -->
-            <div id="notif-bar" class="notif-alert-bar" style="display:none;">
-                <span>📢 푸시 알림을 활성화하고 잊지 마세요!</span>
-                <button class="btn-notif-req" onclick="requestNotificationPermission()">알림 켜기</button>
-            </div>
-
-            <div class="content-area">
-                <div id="routine-list"></div>
-            </div>
+            <div class="content-area"><div id="routine-list"></div></div>
         </section>
 
         <!-- (3) Input View -->
         <section id="input-view">
             <header><div class="header-title" id="input-title">관리 등록</div></header>
             <div class="content-area">
-                <label class="form-label">루틴 이름</label>
-                <input type="text" id="routine-name" placeholder="예: 무알콜 폼 세안">
-                
-                <label class="form-label">알림 시간</label>
-                <input type="time" id="routine-time" value="09:00">
-                
+                <label class="form-label">루틴 이름</label><input type="text" id="routine-name" placeholder="예: 무알콜 폼 세안">
+                <label class="form-label">알림 시간</label><input type="time" id="routine-time" value="09:00">
                 <label class="form-label">반복 설정</label>
-                <div class="repeat-mode-tabs" id="mode-tabs">
-                    <button class="mode-tab active" onclick="setRepeatMode('everyday')">매일</button>
-                    <button class="mode-tab" onclick="setRepeatMode('weekdays')">평일</button>
-                    <button class="mode-tab" onclick="setRepeatMode('custom')">직접 선택</button>
+                <div class="repeat-mode-tabs"><button class="mode-tab active" onclick="setRepeatMode('everyday')">매일</button><button class="mode-tab" onclick="setRepeatMode('weekdays')">평일</button><button class="mode-tab" onclick="setRepeatMode('custom')">직접 선택</button></div>
+                <div class="repeat-selector" id="day-selector" style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="월">월</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="화">화</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="수">수</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="목">목</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="금">금</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="토">토</button><button class="day-btn active" onclick="toggleDayCustom(this)" data-day="일">일</button>
                 </div>
-                <div class="repeat-selector" id="day-selector">
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="월">월</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="화">화</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="수">수</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="목">목</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="금">금</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="토">토</button>
-                    <button class="day-btn active" onclick="toggleDayCustom(this)" data-day="일">일</button>
-                </div>
-
-                <label class="form-label">메모</label>
-                <textarea id="routine-memo" rows="4" placeholder="메모할 내용을 적어보세요."></textarea>
+                <label class="form-label">메모</label><textarea id="routine-memo" rows="4" placeholder="메모할 내용을 적어보세요."></textarea>
             </div>
-            <footer>
-                <button class="btn btn-cancel" onclick="switchView('home')">이전으로</button>
-                <button class="btn btn-save" onclick="handleSave()">저장하기</button>
-            </footer>
+            <footer><button class="btn btn-cancel" onclick="switchView('home')">이전으로</button><button class="btn btn-save" onclick="handleSave()">저장하기</button></footer>
         </section>
     </div>
 
     <script>
         lucide.createIcons();
-
-        // [State Management]
-        const STORAGE_KEY = 'self_care_iphone_v6_pwa_push';
+        const STORAGE_KEY = 'self_care_iphone_v7_toast_pwa';
         let routines = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        let activeCat = ''; 
-        let activeIco = '';
+        let activeCat = ''; let activeIco = '';
 
-        // [PWA: Service Worker Registration]
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('[SW] Registered!'))
-                .catch(err => console.error('[SW] Failed', err));
+            navigator.serviceWorker.register('./sw.js').then(() => console.log('[SW] OK'));
         }
 
-        // [Logic: View Switching]
-        function switchView(viewName) {
+        function switchView(v) {
             document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-            const target = document.getElementById(`${viewName}-view`);
-            if (target) target.style.display = 'flex';
-            checkNotificationStatus();
+            document.getElementById(`${v}-view`).style.display = 'flex';
+            checkPermissionOnLoad();
         }
 
         function goToInput(cat, ico) {
             activeCat = cat; activeIco = ico;
             document.getElementById('input-title').innerText = `${ico} ${cat} 관리 등록`;
-            resetDaySelection();
-            switchView('input'); 
+            resetDaySelection(); switchView('input');
         }
 
-        // [Logic: Notification Permission]
-        function checkNotificationStatus() {
-            const bar = document.getElementById('notif-bar');
-            const btn = document.getElementById('notif-btn');
+        // [🌟 iOS Style Toast Logic 🌟]
+        function showiOSNotification(title, body, icon) {
+            const container = document.getElementById('toast-container');
+            document.getElementById('t-title').innerText = title;
+            document.getElementById('t-body').innerText = body;
+            document.getElementById('t-icon').innerText = icon || '✨';
             
-            if (!('Notification' in window)) return;
+            container.classList.add('toast-show');
+            
+            // Interaction Vibration
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
-            if (Notification.permission === 'default') {
-                bar.style.display = 'flex';
-                btn.style.display = 'none';
-            } else if (Notification.permission === 'granted') {
-                bar.style.display = 'none';
-                btn.style.display = 'block';
-            } else {
-                bar.style.display = 'none';
-                btn.style.display = 'none';
-            }
+            setTimeout(() => { container.classList.remove('toast-show'); }, 5000);
         }
 
         function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    alert('알림이 정상적으로 수신됩니다! ✨');
-                    checkNotificationStatus();
+            Notification.requestPermission().then(p => { 
+                if (p === 'granted') {
+                    document.getElementById('notif-denied-alert').style.display = 'none';
+                    showiOSNotification('반가워요!', '이제 모든 루틴 알림을 받을 수 있습니다. ✨', '🔔');
                 }
             });
         }
 
-        // [Logic: Day Selection]
-        function setRepeatMode(mode) {
-           const tabs = document.querySelectorAll('.mode-tab');
-           tabs.forEach(t => t.classList.remove('active'));
-           event.currentTarget.classList.add('active');
-           const days = document.querySelectorAll('#day-selector .day-btn');
-           days.forEach((btn, idx) => {
-               if (mode === 'everyday') btn.classList.add('active');
-               else if (mode === 'weekdays') { if (idx < 5) btn.classList.add('active'); else btn.classList.remove('active'); }
-           });
+        function checkPermissionOnLoad() {
+            const alertBox = document.getElementById('notif-denied-alert');
+            if (Notification.permission === 'denied') alertBox.style.display = 'block';
+            else alertBox.style.display = 'none';
         }
 
-        function toggleDayCustom(btn) {
-            btn.classList.toggle('active');
-            const tabs = document.querySelectorAll('.mode-tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            tabs[2].classList.add('active');
-        }
-
-        function getSelectedDays() {
-            const btns = document.querySelectorAll('#day-selector .day-btn.active');
-            return Array.from(btns).map(b => b.dataset.day);
-        }
-
-        function resetDaySelection() {
-            setRepeatMode('everyday');
-            const tabs = document.querySelectorAll('.mode-tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            tabs[0].classList.add('active');
-        }
-
-        // [Logic: Data Handling & Test Notification]
         function handleSave() {
             const name = document.getElementById('routine-name').value;
             const time = document.getElementById('routine-time').value;
             const memo = document.getElementById('routine-memo').value;
-            const selectedDays = getSelectedDays();
-            
-            let modeLabel = '';
-            if (selectedDays.length === 7) modeLabel = '매일';
-            else if (selectedDays.length === 5 && !selectedDays.includes('토') && !selectedDays.includes('일')) modeLabel = '평일';
-            else modeLabel = selectedDays.join(',');
+            const selectedDays = Array.from(document.querySelectorAll('#day-selector .day-btn.active')).map(b => b.dataset.day);
 
-            if (!name) return alert('이름을 입력하세요!');
-            if (selectedDays.length === 0) return alert('반복할 요일을 하나 이상 선택해 주세요.');
+            if (!name || selectedDays.length === 0) return alert('항목을 확인해 주세요!');
 
-            const newRoutine = {
-                id: Date.now(),
-                category: activeCat, icon: activeIco,
-                name: name, time: time || '09:00',
-                memo: memo,
-                days: selectedDays,
-                modeLabel: modeLabel,
-                date: new Date().toLocaleDateString()
-            };
-
+            const newRoutine = { id: Date.now(), category: activeCat, icon: activeIco, name: name, time: time || '09:00', memo: memo, days: selectedDays };
             routines.unshift(newRoutine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
             renderRoutines();
-            
-            // 🚨 Trigger immediate Test & Start Scheduler
-            triggerTestNotification(activeIco, name);
-            startGlobalAlarmScheduler();
+
+            // Notify Foreground vs Background
+            if (document.visibilityState === 'visible') {
+                showiOSNotification('관리 등록 완료! ❤️', `[${name}] 루틴이 성공적으로 저장되었습니다.`, activeIco);
+            } else {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification('관리 등록 완료!', { body: `[${name}] 루틴이 저장되었습니다.`, icon: 'icon.png' });
+                });
+            }
 
             switchView('home');
-            document.getElementById('routine-name').value = '';
-            document.getElementById('routine-memo').value = '';
             resetDaySelection();
+            startGlobalAlarmScheduler();
         }
-        // [Logic: Regular Alarm Scheduler]
-        let alarmInterval = null;
 
         function startGlobalAlarmScheduler() {
-            if (alarmInterval) clearInterval(alarmInterval);
-            
-            // Every 60 seconds, check for routines matching the current time
-            alarmInterval = setInterval(() => {
+            if (window.alarmInterval) clearInterval(window.alarmInterval);
+            window.alarmInterval = setInterval(() => {
                 const now = new Date();
                 const curDay = ['일','월','화','수','목','금','토'][now.getDay()];
                 const curTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
                 routines.forEach(r => {
-                    if (r.days.includes(curDay) && r.time === curTime) {
-                        displayAlarmNotification(r);
+                    if (r.days.includes(curDay) && r.time === curTime && now.getSeconds() < 2) {
+                        if (document.visibilityState === 'visible') {
+                            showiOSNotification(`${r.category} 시간입니다!`, `${r.name} 루틴을 수행할 시간이에요.`, r.icon);
+                        } else {
+                            navigator.serviceWorker.ready.then(reg => {
+                                reg.showNotification(`[관리] ${r.category} 시간!`, { body: `${r.icon} ${r.name} 루틴을 수행하세요.`, icon: 'icon.png' });
+                            });
+                        }
                     }
                 });
-            }, 60000); 
-        }
-
-        function displayAlarmNotification(routine) {
-            if (Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(`[정기알림] ${routine.category} 시간입니다!`, {
-                        body: `${routine.icon} ${routine.name} 루틴을 수행할 시간이에요.`,
-                        icon: 'icon.png',
-                        badge: 'icon.png',
-                        vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 170, 40, 450, 110, 200, 110, 170, 40],
-                        tag: `routine-alarm-${routine.id}`
-                    });
-                });
-            }
-        }
-
-        function triggerTestNotification(icon, name) {
-            if (Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(registration => {
-                    setTimeout(() => {
-                        registration.showNotification('관리 등록 완료! Spark ✨', {
-                            body: `${icon} [${name}] 계획이 등록되었습니다. 3초 뒤 알림 테스트 성공!`,
-                            icon: 'icon.png',
-                            badge: 'icon.png',
-                            vibrate: [200, 100, 200],
-                            tag: 'routine-save'
-                        });
-                    }, 3000); // 3-second delay as requested
-                });
-            }
+            }, 1000); 
         }
 
         function renderRoutines() {
             const list = document.getElementById('routine-list');
-            if (routines.length === 0) {
-                list.innerHTML = `<div style="text-align:center; color:gray; margin-top:60px;"><p>기록이 없습니다.<br>항목을 눌러 시작해 보세요.</p></div>`;
-                return;
-            }
-            list.innerHTML = '';
+            list.innerHTML = routines.length === 0 ? `<div style="text-align:center; color:gray; margin-top:60px;"><p>기록이 없습니다.</p></div>` : '';
             routines.forEach(r => {
-                const label = r.days ? r.days.join(',') : '매일';
                 const card = document.createElement('div');
                 card.className = 'routine-card';
-                card.innerHTML = `
-                    <div class="routine-icon">${r.icon}</div>
-                    <div class="routine-info">
-                        <div class="routine-name">${r.name}</div>
-                        <div class="routine-meta">🔔 ${r.time} | ${r.category}</div>
-                        <div class="repeat-summary">반복: ${label}</div>
-                    </div>
-                    <button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30; padding:10px;"><i data-lucide="trash-2" size="20"></i></button>
-                `;
+                card.innerHTML = `<div class="routine-icon">${r.icon}</div><div class="routine-info"><div class="routine-name">${r.name}</div><div class="routine-meta">🔔 ${r.time} | 요일 [${r.days.join(',')}]</div></div><button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30;"><i data-lucide="trash-2" size="20"></i></button>`;
                 list.appendChild(card);
             });
             lucide.createIcons();
         }
 
-        function deleteRoutine(id) {
-            if (confirm('삭제할까요?')) {
-                routines = routines.filter(r => r.id !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
-                renderRoutines();
-            }
+        function deleteRoutine(id) { if (confirm('삭제할까요?')) { routines = routines.filter(r => r.id !== id); localStorage.setItem(STORAGE_KEY, JSON.stringify(routines)); renderRoutines(); } }
+        function setRepeatMode(m) {
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.querySelectorAll('#day-selector .day-btn').forEach((b, i) => { if (m === 'everyday') b.classList.add('active'); else if (m === 'weekdays') { if (i < 5) b.classList.add('active'); else b.classList.remove('active'); } });
         }
+        function toggleDayCustom(b) { b.classList.toggle('active'); document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.mode-tab')[2].classList.add('active'); }
+        function resetDaySelection() { setRepeatMode('everyday'); document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.mode-tab')[0].classList.add('active'); }
 
         window.onload = () => {
-            const dateStr = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
-            document.getElementById('today-date').innerText = dateStr;
-            renderRoutines();
-            checkNotificationStatus();
-            startGlobalAlarmScheduler(); // Start checking for regular alarms
+            document.getElementById('today-date').innerText = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
+            renderRoutines(); startGlobalAlarmScheduler(); checkPermissionOnLoad();
         };
     </script>
 </body>
