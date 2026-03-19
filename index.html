@@ -2,14 +2,14 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>나의 관리 루틴 - Self Care Routine</title>
     
     <!-- PWA 및 모바일 최적화 설정 -->
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="theme-color" content="#F2F2F7">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
 
     <!-- Google Fonts: Pretendard for iOS feel -->
@@ -19,30 +19,40 @@
     
     <style>
         :root {
+            /* iOS 시스템 색상 팔레트 */
             --ios-bg: #F2F2F7;
             --ios-white: #FFFFFF;
             --ios-blue: #007AFF;
             --ios-gray: #8E8E93;
-            --ios-border: #C6C6C8;
+            --ios-border: rgba(0, 0, 0, 0.1);
             --ios-text: #1C1C1E;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
+            
+            /* Safe Area 변수 (화면 물리적 여백 고려) */
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+            --header-h: calc(3.5rem + var(--safe-top));
+            --footer-h: calc(3.2rem + var(--safe-bottom));
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: 'Pretendard', -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
+
+        html { font-size: 16px; /* 1rem = 16px */ }
 
         body {
             margin: 0;
             padding: 0;
             background-color: var(--ios-bg);
             color: var(--ios-text);
-            overflow: hidden;
+            overflow: hidden; /* 전체 페이지 스크롤 방지 (영역별 스크롤 지향) */
             height: 100vh;
             width: 100vw;
+            display: flex;
+            flex-direction: column;
         }
 
         /* [🌟 iOS Bottom Tab Bar 🌟] */
@@ -50,11 +60,11 @@
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: calc(52px + var(--safe-bottom));
+            height: var(--footer-h);
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border-top: 0.5px solid rgba(0,0,0,0.1);
+            border-top: 0.5px solid var(--ios-border);
             display: flex;
             justify-content: space-around;
             padding-bottom: var(--safe-bottom);
@@ -68,29 +78,22 @@
             align-items: center;
             justify-content: center;
             color: var(--ios-gray);
-            font-size: 10px;
+            font-size: 0.65rem;
             font-weight: 600;
             cursor: pointer;
             transition: color 0.2s;
         }
 
-        .tab-item i { margin-bottom: 3px; }
+        .tab-item i { margin-bottom: 0.2rem; transform: scale(1.1); }
         .tab-item.active { color: var(--ios-blue); }
 
-        .btn-notif-req {
-            background: var(--ios-blue);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-        }
         /* [Main SPA Control] */
         #app-root {
             position: relative;
             width: 100%;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         section {
@@ -98,56 +101,78 @@
             top: 0; left: 0; width: 100%; height: 100%;
             display: none; flex-direction: column;
             background-color: var(--ios-bg);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* [Splash View] */
-        #splash-view { display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .splash-content { text-align: center; width: 100%; max-width: 400px; }
-        .app-logo { display: block; margin-bottom: 24px; }
-        .app-logo-img { width: 120px; height: 120px; object-fit: contain; }
-        .app-name { font-size: 28px; font-weight: 800; margin-bottom: 48px; color: var(--ios-text); letter-spacing: -1px; }
+        #splash-view { display: flex; justify-content: center; align-items: center; z-index: 100; padding: 1rem; }
+        .splash-content { 
+            text-align: center; width: 100%; max-width: 450px; 
+            padding-top: var(--safe-top);
+        }
+        .app-logo { display: block; margin-bottom: 1.5rem; }
+        .app-logo-img { width: 25vw; max-width: 120px; height: auto; object-fit: contain; }
+        .app-name { font-size: 1.7rem; font-weight: 800; margin-bottom: 2.5rem; color: var(--ios-text); letter-spacing: -1px; }
 
         .main-category-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding: 1rem;
         }
         .main-category-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .main-circle-btn {
-            width: 100px; height: 100px; border-radius: 50%; border: none; background: white;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08); font-size: 44px;
+            width: 22vw; height: 22vw; max-width: 100px; max-height: 100px; 
+            border-radius: 50%; border: none; background: white;
+            box-shadow: 0 0.8rem 2rem rgba(0,0,0,0.08); font-size: 1.8rem;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .main-category-item:active .main-circle-btn { transform: scale(0.9); }
-        .circle-label { margin-top: 12px; font-size: 15px; font-weight: 700; color: #3A3A3C; }
+        .circle-label { margin-top: 0.8rem; font-size: 1rem; font-weight: 700; color: #3A3A3C; }
 
         /* [Home View Content Area] */
-        header { background-color: var(--ios-white); padding: calc(16px + var(--safe-top)) 20px 16px; border-bottom: 0.5px solid var(--ios-border); flex-shrink: 0; z-index: 10; }
-        .header-title { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
-        .content-area { flex: 1; overflow-y: auto; padding: 20px; }
+        header { 
+            background-color: var(--ios-white); 
+            padding: var(--safe-top) 1.25rem 1rem; 
+            border-bottom: 0.5px solid var(--ios-border); 
+            flex-shrink: 0; z-index: 10;
+        }
+        .header-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+        .content-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 1.25rem;
+            -webkit-overflow-scrolling: touch; /* 부드러운 관성 스크롤 전용 */
+        }
 
         /* [Routine Card Style] */
         .routine-card {
-            background-color: var(--ios-white); border-radius: 20px; padding: 18px; display: flex; align-items: center; gap: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 12px;
+            background-color: var(--ios-white); border-radius: 1.25rem; padding: 1.1rem; 
+            display: flex; align-items: center; gap: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 0.75rem;
         }
-        .routine-icon { width: 48px; height: 48px; background-color: #F2F2F7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .routine-icon { width: 3rem; height: 3rem; background-color: #F2F2F7; border-radius: 0.8rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
         .routine-info { flex: 1; }
-        .routine-name { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
-        .routine-meta { font-size: 12px; color: var(--ios-gray); }
+        .routine-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.15rem; }
+        .routine-meta { font-size: 0.8rem; color: var(--ios-gray); font-weight: 500; }
 
         /* [Input Form Style] */
-        .form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #3A3A3C; margin-top: 18px; }
-        input, textarea { width: 100%; padding: 16px; border: 0.5px solid var(--ios-border); border-radius: 14px; font-size: 16px; background-color: var(--ios-white); -webkit-appearance: none; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: #3A3A3C; margin-top: 1.2rem; }
+        input, textarea { 
+            width: 100%; padding: 1rem; border: 0.5px solid var(--ios-border); 
+            border-radius: 0.9rem; font-size: 1rem; background-color: var(--ios-white); 
+            -webkit-appearance: none;
+        }
 
-        .repeat-mode-tabs { display: flex; background-color: #E5E5EA; padding: 2px; border-radius: 10px; margin-bottom: 10px; }
-        .mode-tab { flex: 1; padding: 7px; border: none; background: transparent; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .repeat-mode-tabs { display: flex; background-color: #E5E5EA; padding: 0.2rem; border-radius: 0.8rem; margin-bottom: 0.8rem; }
+        .mode-tab { flex: 1; padding: 0.5rem; border: none; background: transparent; font-size: 0.8rem; font-weight: 700; border-radius: 0.6rem; cursor: pointer; transition: all 0.2s; }
         .mode-tab.active { background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .day-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--ios-border); background: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .day-btn { width: 9vw; height: 9vw; max-width: 38px; max-height: 38px; border-radius: 50%; border: 1px solid var(--ios-border); background: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .day-btn.active { background-color: var(--ios-blue); color: white; border-color: var(--ios-blue); }
 
-        footer { padding: 20px; background-color: var(--ios-white); border-top: 0.5px solid var(--ios-border); display: flex; gap: 12px; padding-bottom: calc(20px + var(--safe-bottom)); }
+        footer { 
+            padding: 1.2rem; background-color: var(--ios-white); 
+            border-top: 0.5px solid var(--ios-border); display: flex; gap: 0.75rem; 
+            padding-bottom: calc(1.2rem + var(--safe-bottom)); 
+        }
         .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; }
         .btn-save { background-color: var(--ios-blue); color: white; }
         .btn-cancel { background-color: #E5E5EA; color: #1C1C1E; }
