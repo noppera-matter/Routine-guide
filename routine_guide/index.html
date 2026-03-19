@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>나의 관리 루틴 - Self Care Routine</title>
+    
+    <!-- PWA 및 모바일 최적화 설정 -->
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Android 주소창 색상 및 iOS 상태바 설정 -->
+    <meta name="theme-color" content="#F2F2F7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- 🛑 [수정 안내] manifest.json 내의 아이콘 경로도 실제 이미지 파일명으로 맞춰 수정해야 합니다. -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Google Fonts: Pretendard for iOS feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-white: #FFFFFF;
+            --ios-blue: #007AFF;
+            --ios-gray: #8E8E93;
+            --ios-border: #C6C6C8;
+            --ios-text: #1C1C1E;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* [Main SPA Control] */
+        #app-root {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Controlled by switchView() */
+            flex-direction: column;
+            background-color: var(--ios-bg);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* [Splash/Start View] */
+        #splash-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F2F2F7 100%);
+            z-index: 100;
+        }
+
+        .splash-content {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .app-logo { display: block; margin-bottom: 24px; }
+        .app-logo-img { width: 120px; height: 120px; object-fit: contain; }
+        .app-name { font-size: 28px; font-weight: 800; margin-bottom: 48px; color: var(--ios-text); letter-spacing: -1px; }
+
+        .main-category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 20px;
+            justify-items: center;
+        }
+
+        .main-category-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .main-circle-btn {
+            width: 100px; height: 100px; border-radius: 50%; border: none; background: white;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08); font-size: 44px;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .main-category-item:active .main-circle-btn { transform: scale(0.9); }
+        .circle-label { margin-top: 12px; font-size: 15px; font-weight: 700; color: #3A3A3C; }
+
+        /* [Home View Content Area] */
+        header { background-color: var(--ios-white); padding: calc(16px + var(--safe-top)) 20px 16px; border-bottom: 0.5px solid var(--ios-border); flex-shrink: 0; z-index: 10; }
+        .header-title { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+        .content-area { flex: 1; overflow-y: auto; padding: 20px; }
+
+        /* [Routine Card Style] */
+        .routine-card {
+            background-color: var(--ios-white); border-radius: 20px; padding: 18px; display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 12px;
+        }
+        .routine-icon { width: 48px; height: 48px; background-color: #F2F2F7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .routine-info { flex: 1; }
+        .routine-name { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+        .routine-meta { font-size: 12px; color: var(--ios-gray); }
+
+        /* [Input Form Style] */
+        .form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #3A3A3C; margin-top: 20px; }
+        input, textarea { width: 100%; padding: 18px; border: 0.5px solid var(--ios-border); border-radius: 16px; font-size: 16px; background-color: var(--ios-white); -webkit-appearance: none; }
+        input:focus, textarea:focus { outline: none; border-color: var(--ios-blue); }
+
+        footer { padding: 20px; background-color: var(--ios-white); border-top: 0.5px solid var(--ios-border); display: flex; gap: 12px; padding-bottom: calc(20px + var(--safe-bottom)); }
+        .btn { flex: 1; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; border: none; cursor: pointer; }
+        .btn-save { background-color: var(--ios-blue); color: white; }
+        .btn-cancel { background-color: #E5E5EA; color: #1C1C1E; }
+    </style>
+</head>
+<body>
+
+    <div id="app-root">
+        
+        <!-- (1) Splash View -->
+        <section id="splash-view" style="display: flex;">
+            <div class="splash-content">
+                <div class="app-logo">
+                    <img src="icon.png" alt="App Logo" class="app-logo-img">
+                </div>
+                <h1 class="app-name">나의 관리 루틴</h1>
+                <div class="main-category-grid">
+                    <div class="main-category-item" onclick="goToInput('바디', '🛁')">
+                        <button class="main-circle-btn">🛁</button>
+                        <div class="circle-label">바디</div>
+                    </div>
+                    <div class="main-category-item" onclick="goToInput('피부', '🧴')">
+                        <button class="main-circle-btn">🧴</button>
+                        <div class="circle-label">피부</div>
+                    </div>
+                    <div class="main-category-item" onclick="goToInput('운동', '🧘‍♂️')">
+                        <button class="main-circle-btn">🧘‍♂️</button>
+                        <div class="circle-label">운동</div>
+                    </div>
+                    <div class="main-category-item" onclick="goToInput('뷰티', '💇‍♀️')">
+                        <button class="main-circle-btn">💇‍♀️</button>
+                        <div class="circle-label">뷰티</div>
+                    </div>
+                </div>
+                <p style="color: var(--ios-gray); margin-top: 40px; font-size: 14px; font-weight: 500;">관리 항목을 선택해 보세요</p>
+            </div>
+        </section>
+
+        <!-- (2) Home View (List) -->
+        <section id="home-view">
+            <header style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="header-title">오늘의 기록 🗓️</div>
+                    <div id="today-date" style="color: var(--ios-gray); font-size: 14px; margin-top: 2px;"></div>
+                </div>
+                <button onclick="switchView('splash')" style="border:none; background:none; font-size: 24px; padding: 4px;">🏠</button>
+            </header>
+            <div class="content-area">
+                <div id="routine-list"></div>
+            </div>
+        </section>
+
+        <!-- (3) Input View -->
+        <section id="input-view">
+            <header><div class="header-title" id="input-title">관리 등록</div></header>
+            <div class="content-area">
+                <label class="form-label">루틴 이름</label>
+                <input type="text" id="routine-name" placeholder="예: 무알콜 폼 세안">
+                <label class="form-label">알림 시간</label>
+                <input type="time" id="routine-time" value="09:00">
+                <label class="form-label">메모</label>
+                <textarea id="routine-memo" rows="4" placeholder="메모할 내용을 적어보세요."></textarea>
+            </div>
+            <footer>
+                <button class="btn btn-cancel" onclick="switchView('home')">이전으로</button>
+                <button class="btn btn-save" onclick="handleSave()">저장하기</button>
+            </footer>
+        </section>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const STORAGE_KEY = 'self_care_iphone_v6_pwa';
+        let routines = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let activeCat = ''; 
+        let activeIco = '';
+
+        function switchView(viewName) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            const target = document.getElementById(`${viewName}-view`);
+            if (target) target.style.display = 'flex';
+        }
+
+        function goToInput(cat, ico) {
+            activeCat = cat; activeIco = ico;
+            document.getElementById('input-title').innerText = `${ico} ${cat} 관리 등록`;
+            switchView('input'); 
+        }
+
+        function handleSave() {
+            const name = document.getElementById('routine-name').value;
+            if (!name) return alert('이름을 입력하세요!');
+
+            const newRoutine = {
+                id: Date.now(),
+                category: activeCat, icon: activeIco,
+                name: name, time: document.getElementById('routine-time').value || '09:00',
+                memo: document.getElementById('routine-memo').value,
+                date: new Date().toLocaleDateString()
+            };
+
+            routines.unshift(newRoutine);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+            renderRoutines();
+            switchView('home');
+            document.getElementById('routine-name').value = '';
+            document.getElementById('routine-memo').value = '';
+        }
+
+        function renderRoutines() {
+            const list = document.getElementById('routine-list');
+            if (routines.length === 0) {
+                list.innerHTML = `<div style="text-align:center; color:gray; margin-top:60px;"><p>기록이 없습니다.<br>항목을 눌러 시작해 보세요.</p></div>`;
+                return;
+            }
+            list.innerHTML = '';
+            routines.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'routine-card';
+                card.innerHTML = `
+                    <div class="routine-icon">${r.icon}</div>
+                    <div class="routine-info">
+                        <div class="routine-name">${r.name}</div>
+                        <div style="font-size:12px; color:gray">🔔 ${r.time} | ${r.category}</div>
+                    </div>
+                    <button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30; padding:10px;"><i data-lucide="trash-2" size="20"></i></button>
+                `;
+                list.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function deleteRoutine(id) {
+            if (confirm('삭제할까요?')) {
+                routines = routines.filter(r => r.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+                renderRoutines();
+            }
+        }
+
+        window.onload = () => {
+            const dateStr = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
+            document.getElementById('today-date').innerText = dateStr;
+            renderRoutines();
+        };
+    </script>
+</body>
+</html>
