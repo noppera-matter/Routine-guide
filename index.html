@@ -139,7 +139,9 @@
             flex: 1; 
             overflow-y: auto; 
             padding: 1.25rem;
-            -webkit-overflow-scrolling: touch; /* 부드러운 관성 스크롤 전용 */
+            /* 하단 탭 바 + 세이프 영역만큼 충분한 여백 확보 */
+            padding-bottom: calc(var(--footer-h) + 1.5rem);
+            -webkit-overflow-scrolling: touch; 
         }
 
         /* [Routine Card Style] */
@@ -409,6 +411,12 @@
                 card.innerHTML = `<div class="routine-icon">${r.icon}</div><div class="routine-info"><div class="routine-name">${r.name}</div><div class="routine-meta">🔔 ${r.time} | 요일 [${r.days.join(',')}]</div></div><button onclick="deleteRoutine(${r.id})" style="border:none; background:none; color:#FF3B30;"><i data-lucide="trash-2" size="20"></i></button>`;
                 list.appendChild(card);
             });
+            
+            // 🔥 iPhone 14 등 베젤 여백을 위한 하단 스페이서 추가
+            const spacer = document.createElement('div');
+            spacer.style.height = 'var(--footer-h)';
+            list.appendChild(spacer);
+
             lucide.createIcons();
         }
 
