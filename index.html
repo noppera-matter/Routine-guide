@@ -431,11 +431,11 @@
                 <p style="font-size: 0.85rem; color: #8E8E93; margin-bottom: 1rem;">성취도를 별점으로 기록해 주세요.</p>
                 
                 <div class="star-container" id="star-box">
-                    <span class="star-btn" onclick="setRating(1)">⭐</span>
-                    <span class="star-btn" onclick="setRating(2)">⭐</span>
-                    <span class="star-btn" onclick="setRating(3)">⭐</span>
-                    <span class="star-btn" onclick="setRating(4)">⭐</span>
-                    <span class="star-btn" onclick="setRating(5)">⭐</span>
+                    <span class="star-btn" onclick="setRating(1)">☆</span>
+                    <span class="star-btn" onclick="setRating(2)">☆</span>
+                    <span class="star-btn" onclick="setRating(3)">☆</span>
+                    <span class="star-btn" onclick="setRating(4)">☆</span>
+                    <span class="star-btn" onclick="setRating(5)">☆</span>
                 </div>
                 
                 <textarea id="eval-memo" class="eval-memo" placeholder="느낀 점이나 특이사항을 적어주세요..."></textarea>
@@ -824,8 +824,10 @@
         function updateStars() {
             const stars = document.getElementById('star-box').children;
             for (let i = 0; i < stars.length; i++) {
-                stars[i].style.color = i < currentRating ? '#FFCC00' : '#E5E5EA';
-                stars[i].style.transform = i < currentRating ? 'scale(1.1)' : 'scale(1.0)';
+                const filled = i < currentRating;
+                stars[i].innerText = filled ? '★' : '☆';
+                stars[i].style.color = filled ? '#FFCC00' : '#E5E5EA';
+                stars[i].style.transform = filled ? 'scale(1.15)' : 'scale(1.0)';
             }
         }
 
