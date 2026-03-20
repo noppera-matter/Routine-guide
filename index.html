@@ -336,12 +336,11 @@
         @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .star-container { display: flex; justify-content: center; gap: 0.5rem; margin: 1.2rem 0; }
-        .star-btn { font-size: 1.8rem; color: #E5E5EA; cursor: pointer; transition: transform 0.1s; }
-        .star-btn.active { color: #FFCC00; }
-        .star-btn:active { transform: scale(1.2); }
+        .star-container { display: flex; justify-content: center; gap: 0.8rem; margin: 1.5rem 0; }
+        .star-btn { font-size: 2.2rem; color: #E5E5EA; cursor: pointer; transition: transform 0.1s; display: inline-block; }
+        .star-btn:active { transform: scale(1.3); }
         
-        .eval-memo { width: 100%; height: 80px; border: 1px solid #E5E5EA; border-radius: 0.8rem; padding: 0.8rem; font-size: 0.9rem; margin-bottom: 1rem; resize: none; }
+        .eval-memo { width: 100%; height: 90px; border: 1px solid var(--ios-border); border-radius: 1rem; padding: 0.8rem; font-size: 0.95rem; margin-bottom: 1rem; resize: none; background: #fff; }
         .modal-footer { display: flex; gap: 0.6rem; }
         .btn-modal { padding: 0.8rem; border-radius: 0.8rem; border: none; font-weight: 700; flex: 1; cursor: pointer; }
         .btn-done { background: var(--ios-blue); color: white; }
@@ -366,25 +365,27 @@
 
         /* [🌟 iOS Style Toast Notification 🌟] */
         #toast-container {
-            position: fixed; top: -100px; left: 50%; width: 92%; max-width: 400px; z-index: 1000;
+            position: fixed; top: -120px; left: 50%; width: 92%; max-width: 400px; z-index: 5000;
             transform: translateX(-50%); transition: top 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
 
-        .ios-toast {
-            background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 0.5px solid rgba(255, 255, 255, 0.3); border-radius: 24px; padding: 16px 20px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 14px;
+        /* [⭐ Calendar View Styles ⭐] */
+        .calendar-container { padding: 1rem; background: var(--ios-white); border-radius: 1.5rem; margin-top: 1rem; border: 1px solid var(--ios-border); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day-label { text-align: center; font-size: 0.75rem; color: var(--ios-gray); padding-bottom: 5px; }
+        .calendar-cell { 
+            min-height: 50px; border-radius: 8px; border: 0.5px solid #eee; display: flex; flex-direction: column; align-items: center; padding: 2px;
+            font-size: 0.8rem; background: #fff;
         }
-
-        .toast-show { top: calc(16px + var(--safe-top)) !important; }
-        
-        .toast-icon { width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .toast-info { flex: 1; }
-        .toast-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-        .toast-body { font-size: 13px; color: var(--ios-gray); }
-
-        /* [Banner: Permission Denied] */
-        .p-alert { background: #FF3B30; color: white; padding: 14px 20px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 16px 16px; margin: 0 10px; box-shadow: 0 8px 20px rgba(255, 59, 48, 0.2); }
+        .calendar-cell.today { border: 2px solid var(--neon-pink); background: #FFF5F7; }
+        .calendar-cell.other-month { opacity: 0.3; }
+        .calendar-dot-list { display: flex; flex-direction: column; width: 100%; gap: 2px; margin-top: 2px; }
+        .calendar-item-label { 
+            font-size: 0.6rem; background: var(--ios-bg); color: var(--neon-pink); 
+            border-radius: 4px; padding: 1px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;
+            border: 0.5px solid var(--ios-border);
+        }
     </style>
 </head>
 <body>
@@ -472,20 +473,14 @@
                     <div class="main-category-item" onclick="goToInput('운동', '🧘‍♂️')"><button class="main-circle-btn">🧘‍♂️</button><div class="circle-label">운동</div></div>
                     <div class="main-category-item" onclick="goToInput('뷰티', '💇‍♀️')"><button class="main-circle-btn">💇‍♀️</button><div class="circle-label">뷰티</div></div>
                 </div>
-                <!-- Spacing for Bottom Bar -->
                 <div style="height: 100px;"></div>
             </div>
 
-            <!-- Persistent Tab Bar for Root Views -->
+            <!-- Persistent Tab Bar -->
             <nav class="tab-bar">
-                <div class="tab-item active" id="tab-splash" onclick="switchView('splash')">
-                    <i data-lucide="layout-grid" size="24"></i>
-                    <span>홈</span>
-                </div>
-                <div class="tab-item" id="tab-home" onclick="switchView('home')">
-                    <i data-lucide="clipboard-list" size="24"></i>
-                    <span>기록</span>
-                </div>
+                <div class="tab-item active" id="tab-splash" onclick="switchView('splash')"><i data-lucide="layout-grid"></i><span>홈</span></div>
+                <div class="tab-item" id="tab-home" onclick="switchView('home')"><i data-lucide="clipboard-list"></i><span>기록</span></div>
+                <div class="tab-item" id="tab-calendar" onclick="switchView('calendar')"><i data-lucide="calendar"></i><span>달력</span></div>
             </nav>
         </section>
 
@@ -496,20 +491,35 @@
             </header>
             <div class="content-area">
                 <div id="routine-list"></div>
-                <!-- Spacing for Bottom Bar -->
                 <div style="height: 80px;"></div>
             </div>
-
-            <!-- Persistent Tab Bar for Root Views -->
             <nav class="tab-bar">
-                <div class="tab-item" id="tab-splash-2" onclick="switchView('splash')">
-                    <i data-lucide="layout-grid" size="24"></i>
-                    <span>홈</span>
+                <div class="tab-item" id="tab-splash-2" onclick="switchView('splash')"><i data-lucide="layout-grid"></i><span>홈</span></div>
+                <div class="tab-item active" id="tab-home-2" onclick="switchView('home')"><i data-lucide="clipboard-list"></i><span>기록</span></div>
+                <div class="tab-item" id="tab-calendar-2" onclick="switchView('calendar')"><i data-lucide="calendar"></i><span>달력</span></div>
+            </nav>
+        </section>
+
+        <!-- (4) Calendar View -->
+        <section id="calendar-view">
+            <header><div class="header-title">관리 달력 📅</div></header>
+            <div class="content-area">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="day-btn" onclick="changeMonth(-1)"><i data-lucide="chevron-left"></i></button>
+                        <h3 id="calendar-month-title" style="margin:0;">2024년 03월</h3>
+                        <button class="day-btn" onclick="changeMonth(1)"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Days and Cells generated by JS -->
+                    </div>
                 </div>
-                <div class="tab-item active" id="tab-home-2" onclick="switchView('home')">
-                    <i data-lucide="clipboard-list" size="24"></i>
-                    <span>기록</span>
-                </div>
+                <div style="height: 100px;"></div>
+            </div>
+            <nav class="tab-bar">
+                <div class="tab-item" id="tab-splash-3" onclick="switchView('splash')"><i data-lucide="layout-grid"></i><span>홈</span></div>
+                <div class="tab-item" id="tab-home-3" onclick="switchView('home')"><i data-lucide="clipboard-list"></i><span>기록</span></div>
+                <div class="tab-item active" id="tab-calendar-3" onclick="switchView('calendar')"><i data-lucide="calendar"></i><span>달력</span></div>
             </nav>
         </section>
 
@@ -537,12 +547,15 @@
     <script>
         lucide.createIcons();
         const STORAGE_KEY = 'self_care_iphone_eval_v1';
+        const HISTORY_KEY = 'self_care_history_v1';
         let routines = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || {};
         let activeCat = ''; let activeIco = '';
         let currentRating = 0;
         let evalRoutineId = null;
-        let currentEditingId = null; // 수정 중인 루틴의 ID 추적
-        let lastNotifiedTime = {}; // { routineId: lastNotifiedMinuteString }
+        let currentEditingId = null; 
+        let lastNotifiedTime = {}; 
+        let calendarDate = new Date();
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => console.log('[SW] OK'));
@@ -554,19 +567,30 @@
             if (target) target.style.display = 'flex';
             
             // Toggle Tab Bar Active State
-            const isHomeActive = (v === 'splash' || v === 'launch-screen');
-            const tabSplash = document.getElementById('tab-splash');
-            const tabHome = document.getElementById('tab-home');
-            const tabSplash2 = document.getElementById('tab-splash-2');
-            const tabHome2 = document.getElementById('tab-home-2');
+            const isHome = (v === 'splash' || v === 'launch-screen');
+            const isRec = (v === 'home');
+            const isCal = (v === 'calendar');
 
-            if (tabSplash) tabSplash.classList.toggle('active', isHomeActive);
-            if (tabHome) tabHome.classList.toggle('active', !isHomeActive);
-            if (tabSplash2) tabSplash2.classList.toggle('active', isHomeActive);
-            if (tabHome2) tabHome2.classList.toggle('active', !isHomeActive);
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            if(isHome) { 
+                document.getElementById('tab-splash')?.classList.add('active'); 
+                document.getElementById('tab-splash-2')?.classList.add('active'); 
+                document.getElementById('tab-splash-3')?.classList.add('active'); 
+            }
+            if(isRec) { 
+                document.getElementById('tab-home')?.classList.add('active'); 
+                document.getElementById('tab-home-2')?.classList.add('active'); 
+                document.getElementById('tab-home-3')?.classList.add('active'); 
+            }
+            if(isCal) { 
+                document.getElementById('tab-calendar')?.classList.add('active'); 
+                document.getElementById('tab-calendar-2')?.classList.add('active'); 
+                document.getElementById('tab-calendar-3')?.classList.add('active'); 
+                renderCalendar(); 
+            }
 
             checkPermissionOnLoad();
-            lucide.createIcons(); // Ensure icons load in new tabs
+            lucide.createIcons();
         }
 
         function goToInput(cat, ico) {
@@ -756,25 +780,34 @@
             const r = routines.find(x => x.id === id);
             if (!r) return;
 
-            if (!r.completed) {
-                // 완료되지 않은 경우 매기기 모달 띄우기
+            const tKey = new Date().toISOString().split('T')[0];
+            const isComp = (history[tKey] || []).some(h => h.routineId === id);
+
+            if (!isComp) {
                 openEvalModal(id);
             } else {
-                // 이미 완료된 경우 취소 (확인 팝업 가능)
-                if(confirm('완료 기록을 삭제하시겠습니까?')) {
-                    r.completed = false;
-                    r.rating = 0;
-                    r.memo = '';
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
+                if(confirm('이 기록을 삭제하시겠습니까?')) {
+                    history[tKey] = history[tKey].filter(h => h.routineId !== id);
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
                     renderRoutines();
+                    if(document.getElementById('calendar-view').style.display === 'flex') renderCalendar();
                 }
             }
         }
 
-        function openEvalModal(id) {
+        function openEvalModal(id, dateKey = null) {
             evalRoutineId = id;
             currentRating = 0;
-            document.getElementById('eval-memo').value = '';
+            const targetDate = dateKey || new Date().toISOString().split('T')[0];
+            const existing = (history[targetDate] || []).find(h => h.routineId === id);
+            
+            if(existing) {
+                currentRating = existing.rating;
+                document.getElementById('eval-memo').value = existing.memo;
+            } else {
+                document.getElementById('eval-memo').value = '';
+            }
+            
             updateStars();
             document.getElementById('eval-modal').style.display = 'flex';
         }
@@ -791,28 +824,90 @@
         function updateStars() {
             const stars = document.getElementById('star-box').children;
             for (let i = 0; i < stars.length; i++) {
-                stars[i].classList.toggle('active', i < currentRating);
+                stars[i].style.color = i < currentRating ? '#FFCC00' : '#E5E5EA';
+                stars[i].style.transform = i < currentRating ? 'scale(1.1)' : 'scale(1.0)';
             }
         }
 
         function saveEvaluation() {
-            if (currentRating === 0) {
-                alert('최소 1점 이상의 별점을 선택해 주세요!');
-                return;
-            }
+            if (currentRating === 0) return alert('별점을 선택해 주세요!');
+
             const r = routines.find(x => x.id === evalRoutineId);
-            if (r) {
-                r.completed = true;
-                r.rating = currentRating;
-                r.memo = document.getElementById('eval-memo').value;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
-                renderRoutines();
-                closeEvalModal();
-                showiOSNotification('🎉 관리 완료!', '수고하셨습니다. 기록이 저장되었습니다.');
+            if (!r) return;
+
+            const dateKey = new Date().toISOString().split('T')[0];
+            if (!history[dateKey]) history[dateKey] = [];
+            
+            const idx = history[dateKey].findIndex(h => h.routineId === evalRoutineId);
+            const entry = { routineId: evalRoutineId, name: r.name, icon: r.icon, rating: currentRating, memo: document.getElementById('eval-memo').value };
+            
+            if(idx > -1) history[dateKey][idx] = entry;
+            else history[dateKey].push(entry);
+
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderRoutines();
+            closeEvalModal();
+            showiOSNotification('🎉 완료!', '수행 기록이 저장되었습니다.');
+        }
+
+        // --- Calendar Internal Logic ---
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const title = document.getElementById('calendar-month-title');
+            grid.innerHTML = '';
+            
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            title.innerText = `${year}년 ${String(month + 1).padStart(2, '0')}월`;
+            
+            const dayNames = ['일','월','화','수','목','금','토'];
+            dayNames.forEach(d => {
+                const el = document.createElement('div');
+                el.className = 'calendar-day-label';
+                el.innerText = d;
+                grid.appendChild(el);
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for(let i=0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            for(let d=1; d <= lastDate; d++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const cell = document.createElement('div');
+                cell.className = `calendar-cell ${dateKey === todayStr ? 'today' : ''}`;
+                cell.innerHTML = `<div>${d}</div>`;
+                
+                const dotList = document.createElement('div');
+                dotList.className = 'calendar-dot-list';
+                
+                const dayHistory = history[dateKey] || [];
+                dayHistory.forEach(h => {
+                    const item = document.createElement('div');
+                    item.className = 'calendar-item-label';
+                    item.innerText = h.name;
+                    item.onclick = (e) => { e.stopPropagation(); showHistoryDetail(dateKey, h); };
+                    dotList.appendChild(item);
+                });
+                
+                cell.appendChild(dotList);
+                grid.appendChild(cell);
             }
         }
 
-        let deleteTargetId = null;
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function showHistoryDetail(date, item) {
+            openEvalModal(item.routineId, date);
+        }
+
         function deleteRoutine(id) { 
             deleteTargetId = id;
             document.getElementById('delete-confirm-modal').style.display = 'flex';
@@ -836,10 +931,9 @@
         }
 
         function handleDeleteFromEdit() {
-            if (currentEditingId) {
-                deleteRoutine(currentEditingId);
-            }
+            if (currentEditingId) deleteRoutine(currentEditingId);
         }
+
         function setRepeatMode(m) {
             document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
             event.currentTarget.classList.add('active');
