@@ -98,6 +98,13 @@
             flex-direction: column;
         }
 
+        section {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column;
+            background-color: var(--ios-bg);
+        }
+
         /* [Launch Screen View] */
         #launch-screen {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -486,6 +493,7 @@
         let currentRating = 0;
         let evalRoutineId = null;
         let currentEditingId = null; // 수정 중인 루틴의 ID 추적
+        let lastNotifiedTime = {}; // { routineId: lastNotifiedMinuteString }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => console.log('[SW] OK'));
@@ -633,20 +641,34 @@
             window.alarmInterval = setInterval(() => {
                 const now = new Date();
                 const curDay = ['일','월','화','수','목','금','토'][now.getDay()];
-                const curTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+                const curHM = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+                const minuteKey = `${curDay}-${curHM}`;
 
                 routines.forEach(r => {
-                    if (r.days.includes(curDay) && r.time === curTime && now.getSeconds() < 2) {
+                    // 요일과 시간이 일치하고, 이번 분기에 알림을 보낸 적이 없는 경우
+                    if (r.days.includes(curDay) && r.time === curHM && lastNotifiedTime[r.id] !== minuteKey) {
+                        lastNotifiedTime[r.id] = minuteKey; // 알림 발송 기록
+                        
                         if (document.visibilityState === 'visible') {
+                            // 앱이 열려있는 경우 iOS 스타일 토스트 알림
                             showiOSNotification(`${r.category} 시간입니다!`, `${r.name} 루틴을 수행할 시간이에요.`, r.icon);
                         } else {
-                            navigator.serviceWorker.ready.then(reg => {
-                                reg.showNotification(`[관리] ${r.category} 시간!`, { body: `${r.icon} ${r.name} 루틴을 수행하세요.`, icon: 'icon.png' });
-                            });
+                            // 앱이 백그라운드인 경우 시스템 푸시 알림
+                            if (Notification.permission === 'granted') {
+                                navigator.serviceWorker.ready.then(reg => {
+                                    reg.showNotification(`[루틴 가이드] ${r.category}`, {
+                                        body: `${r.icon} ${r.name} 루틴을 수행하세요.`,
+                                        icon: 'icon.png',
+                                        badge: 'icon.png',
+                                        vibrate: [200, 100, 200],
+                                        tag: `routine-${r.id}`
+                                    });
+                                });
+                            }
                         }
                     }
                 });
-            }, 1000); 
+            }, 2000); // 2초마다 체크 (성능 및 정확도 균형)
         }
 
         function renderRoutines() {
